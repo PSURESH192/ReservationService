@@ -1,4 +1,5 @@
 server.port : 9004
+spring.application.name: reservation-service
 
 spring.datasource.url: jdbc:postgresql://localhost:5432/ReservationService
 spring.datasource.driverClassName: org.postgresql.Driver
@@ -9,4 +10,19 @@ spring.jpa.hibernate.ddl-auto: update
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 spring.data.jpa.repositories.enabled: true
 logging.level.org.springframework.web: INFO
+
+hotel:
+  service:
+    name: hotel-service
+    url: localhost:9001
+    getHotel:
+      path: /hotels/{hotelId}
+
+guest:
+  service:
+    name: guest-service
+    url: localhost:9003
+    getGuest:
+      path: /guests/{guestId}
+
 

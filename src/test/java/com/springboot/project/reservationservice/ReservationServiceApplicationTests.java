@@ -1,7 +1,5 @@
 package com.springboot.project.reservationservice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.project.reservationservice.entity.BookingStatus;
 import com.springboot.project.reservationservice.entity.Reservation;
 import org.junit.jupiter.api.Assertions;
@@ -24,16 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 class ReservationServiceApplicationTests {
 
 	@Autowired
-	private TestRestTemplate testRestTemplate;
+	TestRestTemplate testRestTemplate;
 
 	@BeforeEach
 	public void initMocks() {
 		MockitoAnnotations.initMocks(this);
-	}
-
-	protected String mapToJson(Object obj) throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		return objectMapper.writeValueAsString(obj);
 	}
 
 	@Test

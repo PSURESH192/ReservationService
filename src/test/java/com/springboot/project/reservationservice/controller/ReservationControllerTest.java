@@ -75,5 +75,13 @@ public class ReservationControllerTest {
         Assert.assertEquals(200, status);
     }
 
+    @Test
+    public void testGetReservationSummary() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/reservations/12c9f1e4a1a04878860b588f42d37a6d/reservationSummary")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        Assert.assertEquals(200, status);
+    }
+
 }
 

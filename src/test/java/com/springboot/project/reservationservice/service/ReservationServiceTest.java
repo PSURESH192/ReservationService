@@ -3,8 +3,10 @@ package com.springboot.project.reservationservice.service;
 import com.springboot.project.reservationservice.entity.BookingStatus;
 import com.springboot.project.reservationservice.entity.Reservation;
 import com.springboot.project.reservationservice.mapper.ReservationMapper;
-import com.springboot.project.reservationservice.model.ReservationDetails;
+import com.springboot.project.reservationservice.model.*;
 import com.springboot.project.reservationservice.repository.ReservationRepository;
+import com.springboot.project.reservationservice.service.feign.GuestServiceFeignClient;
+import com.springboot.project.reservationservice.service.feign.HotelServiceFeignClient;
 import com.springboot.project.reservationservice.service.impl.ReservationServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +31,12 @@ public class ReservationServiceTest {
 
     @Mock
     ReservationMapper reservationMapper;
+
+    @Mock
+    GuestServiceFeignClient guestServiceFeignClient;
+
+    @Mock
+    HotelServiceFeignClient hotelServiceFeignClient;
 
     @Before
     public void initMocks() {
@@ -74,5 +82,25 @@ public class ReservationServiceTest {
         Assert.assertEquals(availableRoomForReservation.getRoomId(),reservation.getRoomId());
     }
 
+    @Test
+    public void testGetReservationSummary(){
+        Reservation reservation = Reservation.builder().reservationId("12c9f1e4a1a04878860b588f42d37a6d").roomId(10)
+                .hotelId("12c9f1e4a1a04878860b588f42d37a6d").guestId("12c9f1e4a1a04878860b588f42d37a6d")
+                .reservationFromDate(new Date()).reservationToDate(new Date()).bookingStatus(BookingStatus.AVAILABLE).build();
+        RoomDetails room = RoomDetails.builder().roomId(1).roomType("KING_BED").build();
+        HotelDetails hotel = HotelDetails.builder().hotelId("12c9f1e4a1a04878860b588f42d37a6d")
+                .hotelName("Name").roomDetails(Arrays.asList(room)).build();
+        AddressDetails address = AddressDetails.builder().id(1).addressType("HOME").build();
+        GuestDetails guest = GuestDetails.builder().guestId("12c9f1e4a1a04878860b588f42d37a6d")
+                .guestName("Name").addressDetails(Arrays.asList(address)).build();
+        ReservationSummary reservationSummary = ReservationSummary.builder().reservationId(reservation.getReservationId())
+                .guestDetails(guest).hotelDetails(hotel).build();
+        Mockito.when(reservationRepository.findById("12c9f1e4a1a04878860b588f42d37a6d")).thenReturn(Optional.of(reservation));
+        Mockito.when(hotelServiceFeignClient.getHotel("12c9f1e4a1a04878860b588f42d37a6d")).thenReturn(hotel);
+        Mockito.when(guestServiceFeignClient.getGuest("12c9f1e4a1a04878860b588f42d37a6d")).thenReturn(guest);
+        ReservationSummary reservationSummaryResponse = reservationService.getReservationSummary("12c9f1e4a1a04878860b588f42d37a6d");
+        Assert.assertNotNull(reservationSummaryResponse);
+        Assert.assertEquals(reservationSummaryResponse.getReservationId(),reservation.getReservationId());
+    }
 
 }

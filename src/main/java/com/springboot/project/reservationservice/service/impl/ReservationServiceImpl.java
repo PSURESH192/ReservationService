@@ -3,9 +3,14 @@ package com.springboot.project.reservationservice.service.impl;
 import com.springboot.project.reservationservice.entity.BookingStatus;
 import com.springboot.project.reservationservice.entity.Reservation;
 import com.springboot.project.reservationservice.mapper.ReservationMapper;
+import com.springboot.project.reservationservice.model.GuestDetails;
+import com.springboot.project.reservationservice.model.HotelDetails;
 import com.springboot.project.reservationservice.model.ReservationDetails;
+import com.springboot.project.reservationservice.model.ReservationSummary;
 import com.springboot.project.reservationservice.repository.ReservationRepository;
 import com.springboot.project.reservationservice.service.ReservationService;
+import com.springboot.project.reservationservice.service.feign.GuestServiceFeignClient;
+import com.springboot.project.reservationservice.service.feign.HotelServiceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,17 +27,23 @@ import java.util.stream.Collectors;
 public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
-    private ReservationRepository reservationRepository;
+    ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationMapper reservationMapper;
+    ReservationMapper reservationMapper;
+
+    @Autowired
+    HotelServiceFeignClient hotelServiceFeignClient;
+
+    @Autowired
+    GuestServiceFeignClient guestServiceFeignClient;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String createReservation(ReservationDetails reservationDetails)
     {
         reservationDetails.setReservationId(UUID.randomUUID().toString().replace("-", ""));
-        Reservation reservation = reservationRepository.save(reservationMapper.convertModelToEntity(reservationDetails));
+        reservationRepository.save(reservationMapper.convertModelToEntity(reservationDetails));
         return reservationDetails.getReservationId();
     }
 
@@ -48,6 +59,17 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationDetails getAvailableRoomForReservation(int roomId,Date reservationFrom,Date reservationTo){
         Optional<Reservation> optionalReservationEntity = reservationRepository.findByRoomIdAndReservationFromDateAndReservationToDate(roomId, reservationFrom, reservationTo);
         return optionalReservationEntity.isPresent() ? reservationMapper.convertEntityToModel(optionalReservationEntity.get()) : null ;
+    }
 
+    @Override
+    public ReservationSummary getReservationSummary(String reservationId){
+        Optional<Reservation> reservationOptional = reservationRepository.findById(reservationId);
+        Reservation reservation = reservationOptional.isPresent() ? reservationOptional.get() : new Reservation();
+        HotelDetails hotelDetail = hotelServiceFeignClient.getHotel(reservation.getHotelId());
+        GuestDetails guestDetails = guestServiceFeignClient.getGuest(reservation.getGuestId());
+        return ReservationSummary.builder().reservationId(reservation.getReservationId())
+                .reservationFromDate(reservation.getReservationFromDate()).reservationToDate(reservation.getReservationToDate())
+                .bookingStatus(reservation.getBookingStatus().toString())
+                .hotelDetails(hotelDetail).guestDetails(guestDetails).build();
     }
 }
