@@ -1,5 +1,5 @@
 server.port : 9004
-spring.application.name: reservation-service
+spring.application.name: RESERVATION-SERVICE
 
 spring.datasource.url: jdbc:postgresql://localhost:5432/ReservationService
 spring.datasource.driverClassName: org.postgresql.Driver
@@ -13,14 +13,14 @@ logging.level.org.springframework.web: INFO
 
 hotel:
   service:
-    name: hotel-service
+    name: HOTEL-SERVICE
     url: localhost:9001
     getHotel:
       path: /hotels/{hotelId}
 
 guest:
   service:
-    name: guest-service
+    name: GUEST-SERVICE
     url: localhost:9003
     getGuest:
       path: /guests/{guestId}
