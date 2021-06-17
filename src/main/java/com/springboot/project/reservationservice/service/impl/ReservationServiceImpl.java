@@ -11,6 +11,7 @@ import com.springboot.project.reservationservice.repository.ReservationRepositor
 import com.springboot.project.reservationservice.service.ReservationService;
 import com.springboot.project.reservationservice.service.feign.GuestServiceFeignClient;
 import com.springboot.project.reservationservice.service.feign.HotelServiceFeignClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional
 @Service
 public class ReservationServiceImpl implements ReservationService {

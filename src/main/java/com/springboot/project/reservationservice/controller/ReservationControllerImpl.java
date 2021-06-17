@@ -3,6 +3,7 @@ package com.springboot.project.reservationservice.controller;
 import com.springboot.project.reservationservice.model.ReservationDetails;
 import com.springboot.project.reservationservice.model.ReservationSummary;
 import com.springboot.project.reservationservice.service.ReservationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class ReservationControllerImpl implements ReservationController {
 
